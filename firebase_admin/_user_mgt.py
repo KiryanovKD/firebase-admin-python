@@ -836,6 +836,34 @@ class UserManager:
                 'Failed to generate email action link.', http_response=http_resp)
         return body.get('oobLink')
 
+    def send_email_action_link(self, action_type, email, action_code_settings=None):
+        """Send the email action links for types
+
+        Args:
+            action_type: String. Valid values ['VERIFY_EMAIL', 'EMAIL_SIGNIN', 'PASSWORD_RESET']
+            email: Email of the user for which the action is performed
+            action_code_settings: ``ActionCodeSettings`` object or dict (optional). Defines whether
+                the link is to be handled by a mobile app and the additional state information to be
+                passed in the deep link, etc.
+
+        Raises:
+            UnexpectedResponseError: If the backend server responds with an unexpected message
+            FirebaseError: If an error occurs while generating the link
+            ValueError: If the provided arguments are invalid
+        """
+        payload = {
+            'requestType': _auth_utils.validate_action_type(action_type),
+            'email': _auth_utils.validate_email(email)
+        }
+
+        if action_code_settings:
+            payload.update(encode_action_code_settings(action_code_settings))
+
+        body, http_resp = self._make_request('post', '/accounts:sendOobCode', json=payload)
+        if not body:
+            raise _auth_utils.UnexpectedResponseError(
+                'Failed to send email action link.', http_response=http_resp)
+
     def _make_request(self, method, path, **kwargs):
         url = '{0}{1}'.format(self.base_url, path)
         try:
