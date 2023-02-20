@@ -28,9 +28,7 @@ from firebase_admin import _user_import
 from firebase_admin import _user_mgt
 from firebase_admin import _utils
 
-
 _AUTH_ATTRIBUTE = '_auth'
-
 
 __all__ = [
     'ActionCodeSettings',
@@ -89,6 +87,9 @@ __all__ = [
     'generate_email_verification_link',
     'generate_password_reset_link',
     'generate_sign_in_with_email_link',
+    'send_email_verification_link',
+    'send_password_reset_link',
+    'send_sign_in_with_email_link',
     'get_oidc_provider_config',
     'get_saml_provider_config',
     'get_user',
@@ -412,7 +413,7 @@ def list_users(page_token=None, max_results=_user_mgt.MAX_LIST_USERS_RESULTS, ap
     return client.list_users(page_token=page_token, max_results=max_results)
 
 
-def create_user(**kwargs): # pylint: disable=differing-param-doc
+def create_user(**kwargs):  # pylint: disable=differing-param-doc
     """Creates a new user account with the specified properties.
 
     Args:
@@ -442,7 +443,7 @@ def create_user(**kwargs): # pylint: disable=differing-param-doc
     return client.create_user(**kwargs)
 
 
-def update_user(uid, **kwargs): # pylint: disable=differing-param-doc
+def update_user(uid, **kwargs):  # pylint: disable=differing-param-doc
     """Updates an existing user account with the specified properties.
 
     Args:
@@ -637,6 +638,72 @@ def generate_sign_in_with_email_link(email, action_code_settings, app=None):
         email, action_code_settings=action_code_settings)
 
 
+def send_password_reset_link(email, action_code_settings=None, app=None):
+    """Sned the out-of-band email action link for password reset flows for the specified email
+    address.
+
+    Args:
+        email: The email of the user whose password is to be reset.
+        action_code_settings: ``ActionCodeSettings`` instance (optional). Defines whether
+            the link is to be handled by a mobile app and the additional state information to be
+            passed in the deep link.
+        app: An App instance (optional).
+    Returns:
+        link: The password reset link created by the API
+
+    Raises:
+        ValueError: If the provided arguments are invalid
+        FirebaseError: If an error occurs while generating the link
+    """
+    client = _get_client(app)
+    return client.send_password_reset_link(email, action_code_settings=action_code_settings)
+
+
+def send_email_verification_link(email, action_code_settings=None, app=None):
+    """Send the out-of-band email action link for email verification flows for the specified
+    email address.
+
+    Args:
+        email: The email of the user to be verified.
+        action_code_settings: ``ActionCodeSettings`` instance (optional). Defines whether
+            the link is to be handled by a mobile app and the additional state information to be
+            passed in the deep link.
+        app: An App instance (optional).
+    Returns:
+        link: The email verification link created by the API
+
+    Raises:
+        ValueError: If the provided arguments are invalid
+        FirebaseError: If an error occurs while generating the link
+    """
+    client = _get_client(app)
+    return client.send_email_verification_link(
+        email, action_code_settings=action_code_settings)
+
+
+def send_sign_in_with_email_link(email, action_code_settings, app=None):
+    """Send the out-of-band email action link for email link sign-in flows, using the action
+    code settings provided.
+
+    Args:
+        email: The email of the user signing in.
+        action_code_settings: ``ActionCodeSettings`` instance. Defines whether
+            the link is to be handled by a mobile app and the additional state information to be
+            passed in the deep link.
+        app: An App instance (optional).
+
+    Returns:
+        link: The email sign-in link created by the API
+
+    Raises:
+        ValueError: If the provided arguments are invalid
+        FirebaseError: If an error occurs while generating the link
+    """
+    client = _get_client(app)
+    return client.send_sign_in_with_email_link(
+        email, action_code_settings=action_code_settings)
+
+
 def get_oidc_provider_config(provider_id, app=None):
     """Returns the ``OIDCProviderConfig`` with the given ID.
 
@@ -654,6 +721,7 @@ def get_oidc_provider_config(provider_id, app=None):
     """
     client = _get_client(app)
     return client.get_oidc_provider_config(provider_id)
+
 
 def create_oidc_provider_config(
         provider_id, client_id, issuer, display_name=None, enabled=None, client_secret=None,
