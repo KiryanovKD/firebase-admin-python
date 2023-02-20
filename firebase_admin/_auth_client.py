@@ -456,6 +456,23 @@ class Client:
         return self._user_manager.generate_email_action_link(
             'PASSWORD_RESET', email, action_code_settings=action_code_settings)
 
+    def send_password_reset_link(self, email, action_code_settings=None):
+        """Send the email action link for password reset.
+
+        Args:
+            email: The email of the user whose password is to be reset.
+            action_code_settings: ``ActionCodeSettings`` instance (optional). Defines whether
+                the link is to be handled by a mobile app and the additional state information to
+                be passed in the deep link.
+
+        Raises:
+            ValueError: If the provided arguments are invalid
+            EmailNotFoundError: If no user exists for the specified email address.
+            FirebaseError: If an error occurs while generating the link
+        """
+        return self._user_manager.send_email_action_link(
+            'PASSWORD_RESET', email, action_code_settings=action_code_settings)
+
     def generate_email_verification_link(self, email, action_code_settings=None):
         """Generates the out-of-band email action link for email verification flows for the
         specified email address.
@@ -477,6 +494,23 @@ class Client:
         return self._user_manager.generate_email_action_link(
             'VERIFY_EMAIL', email, action_code_settings=action_code_settings)
 
+    def send_email_verification_link(self, email, action_code_settings=None):
+        """Send the email action link for email verification.
+
+        Args:
+            email: The email of the user to be verified.
+            action_code_settings: ``ActionCodeSettings`` instance (optional). Defines whether
+                the link is to be handled by a mobile app and the additional state information to
+                be passed in the deep link.
+
+        Raises:
+            ValueError: If the provided arguments are invalid
+            UserNotFoundError: If no user exists for the specified email address.
+            FirebaseError: If an error occurs while generating the link
+        """
+        return self._user_manager.send_email_action_link(
+            'VERIFY_EMAIL', email, action_code_settings=action_code_settings)
+
     def generate_sign_in_with_email_link(self, email, action_code_settings):
         """Generates the out-of-band email action link for email link sign-in flows, using the
         action code settings provided.
@@ -495,6 +529,22 @@ class Client:
             FirebaseError: If an error occurs while generating the link
         """
         return self._user_manager.generate_email_action_link(
+            'EMAIL_SIGNIN', email, action_code_settings=action_code_settings)
+
+    def send_sign_in_with_email_link(self, email, action_code_settings):
+        """Send the email with login link.
+
+        Args:
+            email: The email of the user signing in.
+            action_code_settings: ``ActionCodeSettings`` instance. Defines whether
+                the link is to be handled by a mobile app and the additional state information to be
+                passed in the deep link.
+
+        Raises:
+            ValueError: If the provided arguments are invalid
+            FirebaseError: If an error occurs while generating the link
+        """
+        return self._user_manager.send_email_action_link(
             'EMAIL_SIGNIN', email, action_code_settings=action_code_settings)
 
     def get_oidc_provider_config(self, provider_id):
